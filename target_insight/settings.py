@@ -6,7 +6,7 @@ SECRET_KEY = 'django-insecure-target-insight-demo-key-change-in-production'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["localhost", "127.0.0.1","targetinsight.kr", "www.targetinsight.kr", "118.219.233.175"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',

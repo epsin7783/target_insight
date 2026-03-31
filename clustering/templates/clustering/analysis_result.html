@@ -1,0 +1,414 @@
+{% extends 'clustering/base.html' %}
+{% block title %}분석 결과 - Target Insight{% endblock %}
+
+{% block head_extra %}
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+{% endblock %}
+
+{% block extra_style %}
+
+/* ── 분석 요약 헤더 ── */
+.result-header {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.result-header h1 { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+.result-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+.result-meta span { font-size: 12px; color: #64748b; }
+.result-meta strong { color: #1e293b; }
+
+/* ── 섹션 타이틀 ── */
+.sec-title { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+.sec-desc  { font-size: 13px; color: #64748b; margin-bottom: 16px; }
+
+/* ── 군집 카드 그리드 ── */
+.cluster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.cluster-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.cluster-card-top {
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.cluster-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.cluster-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+.cluster-count {
+  font-size: 13px;
+  color: #64748b;
+}
+.cluster-count strong { font-size: 20px; font-weight: 700; color: #0f172a; }
+.cluster-desc {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
+/* 지표 3개 */
+.cluster-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: #f1f5f9;
+  border-top: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+}
+.stat-cell {
+  background: #fff;
+  padding: 12px 14px;
+  text-align: center;
+}
+.stat-cell .sc-val {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  display: block;
+  margin-bottom: 2px;
+}
+.stat-cell .sc-lbl {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+/* 마케팅 추천 영역 */
+.cluster-action {
+  padding: 14px 20px 16px;
+}
+.action-row-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #94a3b8;
+  margin-bottom: 6px;
+  margin-top: 12px;
+}
+.action-row-label:first-child { margin-top: 0; }
+.action-channel {
+  font-size: 13px;
+  color: #1e293b;
+  font-weight: 500;
+}
+.kw-list { display: flex; flex-wrap: wrap; gap: 5px; }
+.kw {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 3px 9px;
+  font-size: 12px;
+  color: #374151;
+}
+.action-msg {
+  font-size: 13px;
+  color: #64748b;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+/* ── 차트 영역 ── */
+.charts-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+@media (max-width: 720px) { .charts-wrap { grid-template-columns: 1fr; } }
+.chart-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+}
+.chart-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+.chart-card-sub {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 16px;
+}
+.chart-box { width: 100%; height: 320px; }
+
+/* ── RFM 설명 ── */
+.rfm-explain {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+.rfm-explain-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+.rfm-explain-toggle h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+}
+.rfm-explain-toggle span { font-size: 12px; color: #94a3b8; }
+.rfm-explain-body {
+  display: none;
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+@media (max-width: 600px) { .rfm-explain-body { grid-template-columns: 1fr; } }
+.rfm-item {}
+.rfm-item .ri-title { font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+.rfm-item .ri-title span { color: #1d4ed8; }
+.rfm-item p { font-size: 12px; color: #64748b; line-height: 1.6; }
+
+/* ── 하단 버튼 ── */
+.result-footer { display: flex; gap: 10px; padding-top: 8px; }
+.btn-back {
+  display: inline-block;
+  padding: 9px 20px;
+  background: #fff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  font-family: inherit;
+}
+.btn-back:hover { background: #f8fafc; }
+{% endblock %}
+
+{% block content %}
+
+<!-- 분석 요약 헤더 -->
+<div class="result-header">
+  <div>
+    <h1>분석이 완료됐습니다</h1>
+    <div class="result-meta">
+      <span>파일 <strong>{{ session.file_name }}</strong></span>
+      <span>총 <strong>{{ session.total_customers }}명</strong> 분석</span>
+      <span>{{ session.created_at|date:"Y년 m월 d일 H:i" }}</span>
+    </div>
+  </div>
+  <a href="{% url 'dashboard' %}" class="btn-back">← 새 파일 분석하기</a>
+</div>
+
+<!-- 군집 카드 -->
+<p class="sec-title">고객 그룹 분류 결과</p>
+<p class="sec-desc">총 {{ session.total_customers }}명의 고객이 구매 패턴에 따라 {{ session.n_clusters }}개 그룹으로 나뉘었습니다.</p>
+
+<div class="cluster-grid">
+  {% for c in clusters %}
+  <div class="cluster-card">
+
+    <!-- 그룹명 + 설명 -->
+    <div class="cluster-card-top">
+      <div class="cluster-name-row">
+        <span class="cluster-badge" style="background:{{ c.badge_color }};">{{ c.name }}</span>
+        <span class="cluster-count">
+          <strong>{{ c.count }}</strong>명 &nbsp;
+          ({% widthratio c.count session.total_customers 100 %}%)
+        </span>
+      </div>
+      <p class="cluster-desc">{{ c.description }}</p>
+    </div>
+
+    <!-- 핵심 지표 (한국어로) -->
+    <div class="cluster-stats">
+      <div class="stat-cell">
+        <span class="sc-val" style="color:{{ c.badge_color }};">{{ c.avg_r|floatformat:0 }}일</span>
+        <span class="sc-lbl">마지막 방문<br>기준 경과일</span>
+      </div>
+      <div class="stat-cell">
+        <span class="sc-val" style="color:{{ c.badge_color }};">{{ c.avg_f|floatformat:0 }}회</span>
+        <span class="sc-lbl">평균<br>구매 횟수</span>
+      </div>
+      <div class="stat-cell">
+        <span class="sc-val" style="color:{{ c.badge_color }};">{{ c.avg_m|floatformat:0 }}원</span>
+        <span class="sc-lbl">평균<br>결제 금액</span>
+      </div>
+    </div>
+
+    <!-- 마케팅 추천 -->
+    <div class="cluster-action">
+      <p class="action-row-label">추천 마케팅 채널</p>
+      <p class="action-channel">{{ c.channel }}</p>
+
+      <p class="action-row-label">타겟 키워드</p>
+      <div class="kw-list">
+        {% for kw in c.keywords.split %}
+        <span class="kw">{{ kw|cut:"," }}</span>
+        {% endfor %}
+      </div>
+
+      <p class="action-row-label">추천 메시지</p>
+      <p class="action-msg">"{{ c.message }}"</p>
+    </div>
+
+  </div>
+  {% endfor %}
+</div>
+
+<!-- 차트 -->
+<p class="sec-title">시각화 차트</p>
+<p class="sec-desc">고객 분포를 그래프로 확인하세요. 점에 마우스를 올리면 고객 정보를 볼 수 있습니다.</p>
+
+<div class="charts-wrap">
+  <div class="chart-card">
+    <p class="chart-card-title">그룹별 고객 비율</p>
+    <p class="chart-card-sub">전체 고객 중 각 그룹이 차지하는 비율</p>
+    <div id="pieChart" class="chart-box"></div>
+  </div>
+  <div class="chart-card">
+    <p class="chart-card-title">방문 시점 vs 결제 금액</p>
+    <p class="chart-card-sub">가로: 마지막 방문이 얼마나 됐는지 (일) &nbsp;·&nbsp; 세로: 평균 결제 금액</p>
+    <div id="scatterChart" class="chart-box"></div>
+  </div>
+</div>
+
+<!-- RFM 설명 (접기/펼치기 없이 항상 노출) -->
+<div class="rfm-explain">
+  <h3 style="font-size:13px; font-weight:700; color:#475569; margin-bottom:14px;">
+    이 분석은 어떻게 이루어지나요?
+  </h3>
+  <div class="rfm-explain-body" style="display:grid;">
+    <div class="rfm-item">
+      <p class="ri-title"><span>방문 최신성</span> (Recency)</p>
+      <p>고객이 마지막으로 방문한 게 얼마나 됐는지를 봅니다. 최근에 방문한 고객일수록 재구매 가능성이 높습니다.</p>
+    </div>
+    <div class="rfm-item">
+      <p class="ri-title"><span>구매 빈도</span> (Frequency)</p>
+      <p>고객이 얼마나 자주 구매했는지를 봅니다. 자주 사는 고객은 브랜드에 대한 충성도가 높습니다.</p>
+    </div>
+    <div class="rfm-item">
+      <p class="ri-title"><span>결제 금액</span> (Monetary)</p>
+      <p>고객이 지금까지 얼마나 지출했는지를 봅니다. 금액이 클수록 비즈니스에 기여도가 높은 고객입니다.</p>
+    </div>
+  </div>
+</div>
+
+<div class="result-footer">
+  <a href="{% url 'dashboard' %}" class="btn-back">← 새 파일 분석하기</a>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const PIE_DATA       = {{ pie_data_json|safe }};
+const SCATTER_SERIES = {{ scatter_series_json|safe }};
+
+/* 파이 차트 — 조각 라벨 제거, 범례만 표시 */
+const pie = echarts.init(document.getElementById('pieChart'));
+pie.setOption({
+  tooltip: {
+    trigger: 'item',
+    formatter: p => `${p.marker} ${p.name}<br/>${p.value}명 (${p.percent}%)`
+  },
+  legend: {
+    orient: 'horizontal',
+    bottom: 8,
+    itemWidth: 10,
+    itemHeight: 10,
+    textStyle: { fontSize: 12, fontFamily: 'Noto Sans KR, sans-serif', color: '#374151' },
+    formatter: name => name
+  },
+  series: [{
+    type: 'pie',
+    radius: ['38%', '65%'],
+    center: ['50%', '46%'],
+    itemStyle: { borderWidth: 2, borderColor: '#fff' },
+    label: { show: false },
+    labelLine: { show: false },
+    emphasis: {
+      label: { show: true, fontSize: 13, fontWeight: 'bold', formatter: '{b}\n{d}%' }
+    },
+    data: PIE_DATA.map((d, i) => ({
+      ...d,
+      itemStyle: { color: SCATTER_SERIES[i]?.color || '#aaa' }
+    }))
+  }]
+});
+
+/* 산점도 — 축 이름 제거 (카드 부제목에 설명), grid 여백 확보 */
+const scatter = echarts.init(document.getElementById('scatterChart'));
+scatter.setOption({
+  tooltip: { trigger: 'item' },
+  legend: {
+    bottom: 4,
+    itemWidth: 10,
+    itemHeight: 10,
+    textStyle: { fontSize: 11, fontFamily: 'Noto Sans KR, sans-serif', color: '#374151' }
+  },
+  grid: { top: 16, right: 20, bottom: 56, left: 58 },
+  xAxis: {
+    name: '방문 경과일',
+    nameLocation: 'end',
+    nameTextStyle: { fontSize: 10, color: '#94a3b8', padding: [0, 0, 0, 4] },
+    axisLabel: { fontSize: 11, color: '#64748b' },
+    splitLine: { lineStyle: { color: '#f1f5f9' } }
+  },
+  yAxis: {
+    name: '결제금액',
+    nameLocation: 'end',
+    nameTextStyle: { fontSize: 10, color: '#94a3b8', padding: [0, 0, 4, 0] },
+    axisLabel: {
+      fontSize: 11,
+      color: '#64748b',
+      formatter: v => v >= 10000 ? Math.round(v / 10000) + '만' : v
+    },
+    splitLine: { lineStyle: { color: '#f1f5f9' } }
+  },
+  series: SCATTER_SERIES.map(s => ({
+    name: s.name,
+    type: 'scatter',
+    symbolSize: 10,
+    itemStyle: { color: s.color, opacity: 0.8 },
+    data: s.data.map(d => [d[0], d[2], d[1], d[3]]),
+    tooltip: {
+      formatter: p => {
+        const [r, m, f, name] = p.data;
+        return `<b>${p.seriesName}</b><br/>${name}<br/>방문: ${r}일 전 · 구매: ${f}회<br/>결제: ${Number(m).toLocaleString()}원`;
+      }
+    }
+  }))
+});
+
+window.addEventListener('resize', () => { pie.resize(); scatter.resize(); });
+</script>
+{% endblock %}

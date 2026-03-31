@@ -1,0 +1,312 @@
+{% extends 'clustering/base.html' %}
+{% block title %}대시보드 - Target Insight{% endblock %}
+
+{% block extra_style %}
+.dash-wrap {
+  max-width: 720px;
+}
+
+/* 업로드 영역 */
+.upload-box {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+.upload-box-head {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+.upload-box-body {
+  padding: 24px 20px;
+}
+
+.drop-zone {
+  display: block;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 6px;
+  padding: 36px 16px;
+  text-align: center;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-decoration: none;
+}
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: #1d4ed8;
+  background: #eff6ff;
+}
+.drop-zone svg {
+  display: block;
+  margin: 0 auto 10px;
+  color: #94a3b8;
+}
+.drop-zone .dz-title {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+.drop-zone .dz-sub {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.file-pill {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 9px 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #1d4ed8;
+  font-weight: 500;
+}
+.file-pill svg { flex-shrink: 0; color: #1d4ed8; }
+
+/* 컨트롤 줄 */
+.ctrl-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.ctrl-select-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 180px;
+}
+.ctrl-select-wrap label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.3px;
+}
+.ctrl-select-wrap select {
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fff;
+  color: #1e293b;
+  outline: none;
+  height: 36px;
+}
+.ctrl-select-wrap select:focus { border-color: #1d4ed8; }
+
+.ctrl-btns {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding-top: 17px; /* label 높이만큼 내려서 수직 정렬 맞춤 */
+}
+.btn-run {
+  height: 36px;
+  padding: 0 20px;
+  background: #1d4ed8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-run:hover:not(:disabled) { background: #1e40af; }
+.btn-run:disabled { background: #93c5fd; cursor: default; }
+.btn-sample {
+  height: 36px;
+  padding: 0 16px;
+  background: #fff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.btn-sample:hover { background: #f8fafc; border-color: #9ca3af; }
+
+/* 이력 테이블 */
+.hist-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+.hist-box {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.hist-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.hist-table th {
+  text-align: left;
+  padding: 10px 16px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 600;
+  color: #64748b;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+}
+.hist-table td {
+  padding: 11px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #374151;
+}
+.hist-table tbody tr:last-child td { border-bottom: none; }
+.hist-row { cursor: pointer; }
+.hist-row:hover { background: #eff6ff !important; }
+.hist-row:hover td { color: #1e293b; }
+.k-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+{% endblock %}
+
+{% block content %}
+<div class="dash-wrap">
+
+  <div style="margin-bottom: 20px;">
+    <p class="page-title">고객 군집화 분석</p>
+    <p class="page-desc">CSV를 업로드하면 K-Means로 고객을 분류하고 맞춤 마케팅 전략을 추천합니다.</p>
+  </div>
+
+  <!-- 업로드 카드 -->
+  <div class="upload-box">
+    <div class="upload-box-head">CSV 파일 업로드</div>
+    <div class="upload-box-body">
+      <form method="post" action="{% url 'analyze' %}" enctype="multipart/form-data" id="uploadForm">
+        {% csrf_token %}
+
+        <label for="csvInput" class="drop-zone" id="dropZone">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+          </svg>
+          <span class="dz-title">CSV 파일을 클릭하거나 드래그하여 올려주세요</span>
+          <span class="dz-sub">고객명 &nbsp;·&nbsp; 마지막 방문일 &nbsp;·&nbsp; 구매 횟수 &nbsp;·&nbsp; 총 결제 금액</span>
+        </label>
+        <input type="file" id="csvInput" name="csv_file" accept=".csv" style="display:none">
+
+        <div class="file-pill" id="filePill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span id="fileName"></span>
+        </div>
+
+        <div class="ctrl-row">
+          <div class="ctrl-select-wrap">
+            <label>군집 수 (k)</label>
+            <select name="n_clusters">
+              <option value="3" selected>3개 군집 (권장)</option>
+              <option value="4">4개 군집 (세분화)</option>
+            </select>
+          </div>
+          <div class="ctrl-btns">
+            <button type="submit" class="btn-run" id="analyzeBtn" disabled>분석 시작</button>
+            <a href="{% url 'sample_csv' %}" class="btn-sample">샘플 CSV</a>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- 분석 이력 -->
+  {% if sessions %}
+  <p class="hist-title">최근 분석 이력 <span style="font-size:12px; font-weight:400; color:#94a3b8;">— 행을 클릭하면 결과를 다시 볼 수 있습니다</span></p>
+  <div class="hist-box">
+    <table class="hist-table">
+      <thead>
+        <tr>
+          <th>파일명</th>
+          <th>고객 수</th>
+          <th>군집 수</th>
+          <th>분석 일시</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in sessions %}
+        <tr class="hist-row" onclick="location.href='{% url 'session_result' s.id %}'">
+          <td>{{ s.file_name }}</td>
+          <td>{{ s.total_customers }}명</td>
+          <td><span class="k-badge">k = {{ s.n_clusters }}</span></td>
+          <td style="color:#94a3b8;">{{ s.created_at|date:"Y-m-d H:i" }}</td>
+          <td style="color:#1d4ed8; font-size:12px; white-space:nowrap;">결과 보기 →</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const csvInput  = document.getElementById('csvInput');
+const filePill  = document.getElementById('filePill');
+const fileName  = document.getElementById('fileName');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const dropZone  = document.getElementById('dropZone');
+
+function setFile(file) {
+  if (!file || !file.name.endsWith('.csv')) return;
+  const dt = new DataTransfer();
+  dt.items.add(file);
+  csvInput.files = dt.files;
+  fileName.textContent = file.name;
+  filePill.style.display = 'flex';
+  analyzeBtn.disabled = false;
+}
+
+csvInput.addEventListener('change', () => { if (csvInput.files[0]) setFile(csvInput.files[0]); });
+
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  setFile(e.dataTransfer.files[0]);
+});
+
+document.getElementById('uploadForm').addEventListener('submit', () => {
+  analyzeBtn.textContent = '분석 중...';
+  analyzeBtn.disabled = true;
+});
+</script>
+{% endblock %}

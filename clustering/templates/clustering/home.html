@@ -1,0 +1,450 @@
+{% extends 'clustering/base.html' %}
+{% block title %}Target Insight — 고객 군집화 & 마케팅 추천{% endblock %}
+
+{% block extra_style %}
+/* 홈에서는 container 패딩 제거, 풀너비 사용 */
+.container { padding: 0; max-width: 100%; }
+
+/* ── Hero ── */
+.hero {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 80px 24px 72px;
+  text-align: center;
+}
+.hero-eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #1d4ed8;
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #0f172a;
+  margin-bottom: 18px;
+  letter-spacing: -0.5px;
+}
+.hero h1 span {
+  color: #1d4ed8;
+}
+.hero p {
+  font-size: 16px;
+  color: #64748b;
+  line-height: 1.75;
+  max-width: 520px;
+  margin: 0 auto 36px;
+}
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn-hero-primary {
+  background: #1d4ed8;
+  color: #fff;
+  padding: 13px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  display: inline-block;
+}
+.btn-hero-primary:hover { background: #1e40af; }
+.btn-hero-ghost {
+  background: transparent;
+  color: #1d4ed8;
+  padding: 13px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1.5px solid #cbd5e1;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  display: inline-block;
+  color: #475569;
+}
+.btn-hero-ghost:hover { border-color: #94a3b8; color: #1e293b; }
+
+/* ── 기능 소개 ── */
+.features {
+  background: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 56px 24px;
+}
+.features-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+@media (max-width: 680px) {
+  .hero h1 { font-size: 28px; }
+  .features-inner { grid-template-columns: 1fr; gap: 28px; }
+}
+.feature-item {}
+.feature-icon {
+  width: 36px;
+  height: 36px;
+  margin-bottom: 14px;
+  color: #1d4ed8;
+}
+.feature-item h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+.feature-item p {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+/* ── 업로드 섹션 ── */
+.upload-section {
+  background: #fff;
+  padding: 60px 24px;
+}
+.upload-inner {
+  max-width: 680px;
+  margin: 0 auto;
+}
+.upload-inner h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+.upload-inner > p {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 28px;
+}
+.upload-zone {
+  display: block;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 44px 20px;
+  text-align: center;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.upload-zone:hover,
+.upload-zone.drag-over {
+  border-color: #1d4ed8;
+  background: #eff6ff;
+}
+.upload-zone svg {
+  display: block;
+  margin: 0 auto 12px;
+  color: #94a3b8;
+}
+.upload-zone strong {
+  display: block;
+  font-size: 14px;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+.upload-zone span {
+  font-size: 12px;
+  color: #94a3b8;
+}
+.file-selected {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #1d4ed8;
+}
+.file-selected svg { flex-shrink: 0; }
+.upload-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.upload-row .fg { flex: 1; min-width: 180px; }
+.upload-row label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 5px;
+}
+.upload-row select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fff;
+  color: #1e293b;
+  outline: none;
+}
+.upload-row select:focus { border-color: #1d4ed8; }
+.upload-note {
+  margin-top: 16px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+.upload-note a { color: #1d4ed8; text-decoration: none; }
+.upload-note a:hover { text-decoration: underline; }
+
+/* ── 로그인 모달 ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: #fff;
+  border-radius: 10px;
+  width: 380px;
+  max-width: 92vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  overflow: hidden;
+}
+.modal-top {
+  padding: 24px 24px 0;
+}
+.modal-top h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+.modal-top p {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.7;
+}
+.modal-bottom {
+  display: flex;
+  gap: 8px;
+  padding: 20px 24px 24px;
+  justify-content: flex-end;
+}
+.modal-btn-cancel {
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #fff;
+  color: #64748b;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.modal-btn-cancel:hover { background: #f8fafc; }
+.modal-btn-signup {
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #fff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  display: inline-block;
+}
+.modal-btn-signup:hover { background: #eff6ff; }
+.modal-btn-login {
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: #1d4ed8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  display: inline-block;
+}
+.modal-btn-login:hover { background: #1e40af; }
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="hero">
+  <span class="hero-eyebrow">K-Means 머신러닝 기반</span>
+  <h1>고객을 이해하고<br><span>정확하게</span> 타겟하세요</h1>
+  <p>CSV 파일 하나로 고객을 자동 분류하고, 군집별 최적의 광고 채널과 키워드를 제안합니다.</p>
+  <div class="hero-actions">
+    <button class="btn-hero-primary" onclick="scrollToUpload()">지금 무료로 분석하기</button>
+    <a href="{% url 'sample_csv' %}" class="btn-hero-ghost">샘플 데이터 받기</a>
+  </div>
+</section>
+
+<!-- 기능 소개 -->
+<section class="features">
+  <div class="features-inner">
+    <div class="feature-item">
+      <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+      </svg>
+      <h3>RFM 자동 분석</h3>
+      <p>마지막 방문일, 구매 빈도, 결제 금액을 기반으로 고객의 가치를 수치화합니다.</p>
+    </div>
+    <div class="feature-item">
+      <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 8v4l3 3"/>
+      </svg>
+      <h3>K-Means 군집화</h3>
+      <p>데이터만을 근거로 VIP, 이탈 위험, 잠재 고객 등 의미 있는 그룹으로 분류합니다.</p>
+    </div>
+    <div class="feature-item">
+      <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+      </svg>
+      <h3>맞춤 마케팅 추천</h3>
+      <p>각 군집의 특성에 맞는 광고 채널, 타겟 키워드, 메시지 전략을 바로 제안합니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 업로드 -->
+<section class="upload-section" id="uploadSection">
+  <div class="upload-inner">
+    <h2>지금 바로 분석해보세요</h2>
+    <p>별도 설치 없이 CSV만 올리면 30초 안에 결과를 확인할 수 있습니다.</p>
+
+    <form method="post" action="{% url 'analyze' %}" enctype="multipart/form-data" id="uploadForm">
+      {% csrf_token %}
+
+      <label for="csvInput" class="upload-zone" id="dropZone">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+        </svg>
+        <strong>CSV 파일을 드래그하거나 클릭해서 선택</strong>
+        <span>고객명 · 마지막 방문일 · 구매 횟수 · 총 결제 금액</span>
+      </label>
+      <input type="file" id="csvInput" name="csv_file" accept=".csv" style="display:none">
+
+      <div class="file-selected" id="fileSelected">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+        </svg>
+        <span id="fileName"></span>
+      </div>
+
+      <div class="upload-row">
+        <div class="fg">
+          <label>군집 수 선택</label>
+          <select name="n_clusters">
+            <option value="3" selected>3개 군집 (권장)</option>
+            <option value="4">4개 군집 (세분화)</option>
+          </select>
+        </div>
+        <button type="button" id="analyzeBtn" class="btn-hero-primary" style="height:40px; padding:0 24px; font-size:14px;" disabled onclick="handleAnalyze()">
+          분석 시작
+        </button>
+      </div>
+
+      <p class="upload-note">
+        CSV 형식이 궁금하신가요?
+        <a href="{% url 'sample_csv' %}">샘플 파일 다운로드</a>
+      </p>
+    </form>
+  </div>
+</section>
+
+<!-- 로그인 필요 모달 -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <div class="modal-top">
+      <h3>로그인이 필요합니다</h3>
+      <p>분석 결과와 마케팅 추천 전략을 확인하려면 로그인이 필요합니다.<br>무료로 가입하고 바로 이용해 보세요.</p>
+    </div>
+    <div class="modal-bottom">
+      <button class="modal-btn-cancel" onclick="closeModal()">취소</button>
+      <a href="{% url 'signup' %}" class="modal-btn-signup">회원가입</a>
+      <a href="{% url 'login' %}?next={% url 'dashboard' %}" class="modal-btn-login">로그인</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const IS_LOGGED_IN = {{ user.is_authenticated|lower }};
+const csvInput    = document.getElementById('csvInput');
+const fileSelected = document.getElementById('fileSelected');
+const fileName    = document.getElementById('fileName');
+const analyzeBtn  = document.getElementById('analyzeBtn');
+const dropZone    = document.getElementById('dropZone');
+
+function setFile(file) {
+  if (!file || !file.name.endsWith('.csv')) return;
+  const dt = new DataTransfer();
+  dt.items.add(file);
+  csvInput.files = dt.files;
+  fileName.textContent = file.name;
+  fileSelected.style.display = 'flex';
+  analyzeBtn.disabled = false;
+}
+
+csvInput.addEventListener('change', () => {
+  if (csvInput.files[0]) setFile(csvInput.files[0]);
+});
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  setFile(e.dataTransfer.files[0]);
+});
+
+function handleAnalyze() {
+  if (!IS_LOGGED_IN) {
+    document.getElementById('loginModal').classList.add('show');
+    return;
+  }
+  analyzeBtn.textContent = '분석 중...';
+  analyzeBtn.disabled = true;
+  document.getElementById('uploadForm').submit();
+}
+
+function closeModal() {
+  document.getElementById('loginModal').classList.remove('show');
+}
+
+document.getElementById('loginModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+function scrollToUpload() {
+  document.getElementById('uploadSection').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+{% endblock %}
